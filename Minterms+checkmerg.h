@@ -68,9 +68,8 @@ void Minterms::decToBinary()
 		cout << endl;
 		*/
 }
-int checkmerg (int x, int Y)
+int checkmerg (Minterms object)
 {
-	int d1,d2;
 	int dp = 0;
 	int numofdif = 0;
 	int count = 0;
@@ -78,13 +77,10 @@ int checkmerg (int x, int Y)
 	{
 		if (numofdif <= 1)
 		{
-			d1 = x % 10;
-			x /= 10;
-			d2 = y % 10;
-			y /= 10;
-			if (d1 != d2)
+			
+			if (this->digits[count] != object.digits[count])
 			{
-				dp++;
+				dp==count;
 				numofdif++;
 			}
 		}
