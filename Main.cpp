@@ -6,7 +6,6 @@
 #include "Minterms.h"
 using namespace std;
 
-void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms>& unmerged);
 
 int main() {
 	vector<vector<int>> minAdont(3);
@@ -23,14 +22,14 @@ int main() {
 		int r = 0;
 		while (!myfile.eof())
 		{
-
+			
 			getline(myfile, line);
 			stringstream word(line);
-
+			
 			while (getline(word, num, ','))
 			{
 				minAdont[r].push_back(stoi(num));
-
+				
 			}
 			r++;
 		}
@@ -45,7 +44,6 @@ int main() {
 
 	vector<vector<vector<Minterms>>> objects(1);
 	vector<Minterms> mintermsList;
-	vector<Minterms> unmerged;
 	int numMinterms, numDontCares; //To carry number of minterms and number of don't cares
 	int variables = minAdont[0][0];
 
@@ -55,10 +53,10 @@ int main() {
 	mintermsList.resize(numMinterms + numDontCares);
 
 	for (int i = 0; i < numMinterms + numDontCares; i++) {
-		if (i < numMinterms)
+		if(i<numMinterms)
 			mintermsList[i].SetUp(minAdont[1][i], true, variables);
 		else
-			mintermsList[i].SetUp(minAdont[2][i - numMinterms], false, variables);
+			mintermsList[i].SetUp(minAdont[2][i-numMinterms], false, variables);
 	}
 
 	objects[0].resize(variables + 1);//The first 2D table will have number of rows equal to all possible number of 1s
@@ -67,46 +65,10 @@ int main() {
 		for (int j = 0; j < mintermsList.size(); j++) {
 			if (mintermsList[j].NumberOnes() == variables - i) {
 				objects[0][i].push_back(mintermsList[j]);
-				objects[0][i].back().printBinary();
+				mintermsList[j].printBinary();
 			}
 		}
 	}
 
 
-}
-
-void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms> unmerged) {
-	bool anyMerge = true;
-	bool mergePerMinterm;
-	int impColumn = 0; //First column in implication table aka first 2D tabel in 3D table
-
-	while (anyMerge) {
-		anyMerge = false;
-		table.resize(impColumn + 2);
-
-		for (int row = 0; row < table[impColumn].size() - 1; row++) {
-
-			for (int v1 = 0; v1 < table[impColumn][row].size(); v1++) {
-				mergePerMinterm = false;
-
-				for (int v2 = 0; v2 < table[impColumn][row + 1].size(); v2++) {
-					//Call class function to check eligibility to merge
-					//if eligible call merge function and anyMerge=true and mergePerMinterm true
-				}
-
-				if (!mergePerMinterm) {
-					unmerged.push_back(table[impColumn][row][v1]);
-				}
-			}
-		}
-
-
-		impColumn++;
-	}
-
-	for (int i = 0; i < table[impColumn].size(); i++) {
-		for (int j = 0; j < table[impColumn][i].size(); j++) {
-			unmerged.push_back(table[impColumn][i][j]);
-		}
-	}
 }
