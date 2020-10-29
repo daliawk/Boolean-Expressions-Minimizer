@@ -63,9 +63,9 @@ int main() {
 
 	for (int i = 0; i <= variables; i++) {
 		for (int j = 0; j < mintermsList.size(); j++) {
-			if (mintermsList[j].NumberOnes() == i) {
+			if (mintermsList[j].NumberOnes() == variables - i) {
 				objects[0][i].push_back(mintermsList[j]);
-				
+				mintermsList[j].printBinary();
 			}
 		}
 	}
