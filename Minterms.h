@@ -19,6 +19,7 @@ public:
 	void decToBinary();
 	int NumberOnes() { return numOnes; }
 	void printBinary() { for (int i = size - 1; i >= 0; i--) cout << digits[i]; cout << endl; }
+	int checkmerg (int y);
 };
 
 
@@ -67,5 +68,28 @@ void Minterms::decToBinary()
 		cout << endl;
 		*/
 }
-
+int checkmerg (Minterms object)
+{
+	int dp = 0;
+	int numofdif = 0;
+	int count = 0;
+	while (count < size)
+	{
+		if (numofdif <= 1)
+		{
+			
+			if (this->digits[count] != object.digits[count])
+			{
+				dp==count;
+				numofdif++;
+			}
+		}
+		else
+		{
+			return -1;
+		}
+		count++;
+	}
+	return dp;
+}
 #endif
