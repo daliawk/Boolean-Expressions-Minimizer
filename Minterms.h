@@ -8,41 +8,32 @@ using namespace std;
 
 class Minterms {
 private:
-	vector<int> values;
-	vector<string> digits;
-	int numOnes;
-	int size;
-	bool minterm;
+	vector<int> values; //Decimal value of the minterm or values of minterms
+	vector<string> digits; //Binary digits of the minterm or merged minterms
+	int numOnes; //number of ones in the binary value
+	int size; //Number of variables aka number of binary digits
+	bool merged; //If this minterm has been merged with another minterm or not
 public:
-	Minterms() { numOnes = 0; size = 0; }
-	Minterms(int value, bool min, int s);
-	void SetUp(int value, bool min, int s);
-	void decToBinary();
+	Minterms() { numOnes = 0; size = 0; merged = false; } //Constructor
+	Minterms(vector<string> newbinary); //Constructs a merged minterm
+	void SetUp(int value, int s); //Modifier to set the private values
+	void DecToBinary(); //Sets the binary value of the minterm from its decimal value
 	int NumberOnes() { return numOnes; }
 	void printBinary() { for (int i = size - 1; i >= 0; i--) cout << digits[i]; cout << endl; }
 	vector <string> getdigits() { return digits; }
-	int checkmerg(Minterms object);
-	Minterms Merge(Minterms object1, int position);
-	Minterms(vector<string> newbinary);
+	int checkmerg(Minterms object); //Checks if 2 minterms are eligible for merging
+	Minterms Merge(Minterms& object1, int position); //Merges 2 minterms
 	void Add_Decimal_Value(int number) { values.push_back(number); }
 	void printDecimal() { for (int i = 0; i < values.size(); i++) cout << values[i] << ", "; cout << endl; }
 	int NumberOfDecimal() { return values.size(); }
 	int GetDecimal(int position) { return values[position]; }
-	void SetBoolean(string a1, string a2, string a3, string a4) { digits[0] = a4; digits[1] = a3; digits[2] = a2; digits[3] = a1; } //for testing
-	void BooleanExpression();
+	void BooleanExpression(); //Prints the minterm or merged minterms as a boolean expression
+	bool isMerged() { return merged; }
 };
 
 
-Minterms::Minterms(int value, bool min, int s) {
+void Minterms::SetUp(int value, int s) {
 	values.push_back(value);
-	minterm = min;
-	size = s;
-	digits.resize(s);
-}
-
-void Minterms::SetUp(int value, bool min, int s) {
-	values.push_back(value);
-	minterm = min;
 	size = s;
 	digits.resize(s);
 
@@ -50,7 +41,7 @@ void Minterms::SetUp(int value, bool min, int s) {
 		digits[i] = "0";
 	}
 
-	decToBinary();
+	DecToBinary();
 
 	numOnes = 0;
 	for (int i = 0; i < size; i++) {
@@ -58,9 +49,10 @@ void Minterms::SetUp(int value, bool min, int s) {
 			numOnes++;
 		}
 	}
+	merged = false;
 }
 
-void Minterms::decToBinary()
+void Minterms::DecToBinary()
 {
 	int n = values[0];
 
@@ -73,7 +65,7 @@ void Minterms::decToBinary()
 	}
 
 }
-int Minterms::checkmerg(Minterms object)
+int Minterms::checkmerg(Minterms object) //Returns -1 if not eligble to merge, otherwize, returns the position of the different digit
 {
 	int dp = 0;
 	int numofdif = 0;
@@ -102,28 +94,32 @@ int Minterms::checkmerg(Minterms object)
 		return -1;
 }
 
-Minterms Minterms::Merge(Minterms object1, int position) {
-	vector<string> mergestring(size);
-	for (int i = 0; i < size; i++) {
+Minterms Minterms::Merge(Minterms& object1, int position) {
+	vector<string> mergestring(size); //Binary digits of the new merged minterm
+
+	for (int i = 0; i < size; i++) { //adds * in the place of the different digit
 		if (i == position)
 			mergestring[i] = "*";
 		else
 			mergestring[i] = object1.digits[i];
 	}
-	Minterms object2(mergestring);
 
-	for (int i = 0; i < object1.values.size(); i++) {
+	Minterms object2(mergestring);//declares the merged object
+
+	for (int i = 0; i < object1.values.size(); i++) { //Adds decimal values of minterms in the merged minterm
 		object2.values.push_back(object1.values[i]);
 		object2.values.push_back(this->values[i]);
 	}
-	this->printBinary();
-	cout << "+" << endl;
-	object1.printBinary();
-	cout << "=\n";
-	object2.printBinary();
+
+	this->merged = true;
+	object1.merged = true;
+
+
 	return object2;
 
 }
+
+
 Minterms::Minterms(vector<string>newbinary) {
 	digits.resize(newbinary.size());
 	size = newbinary.size();
@@ -134,6 +130,8 @@ Minterms::Minterms(vector<string>newbinary) {
 		if (digits[i] == "1")
 			numOnes++;
 	}
+
+	merged = false;
 }
 
 
@@ -150,3 +148,4 @@ void Minterms::BooleanExpression() {
 
 
 #endif
+
