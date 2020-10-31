@@ -11,9 +11,10 @@ void ConstructChart(vector<Minterms> originalListOfMin, int numMinterms, vector<
 void EPI2(vector<Minterms> originalListOfMin, vector<Minterms> originalPI, vector<Minterms>& EPIlist, vector<vector<bool>>& chart);
 void CheckDominatedRows(vector<Minterms>& originalListOfMin, vector<Minterms>& originalPI, vector<vector<bool>>& chart);
 void CheckDominatingColumns(vector<Minterms>& originalListOfMin, vector<Minterms>& originalPI, vector<vector<bool>>& chart);
-void Sort(vector<int>& arr);
+void Sort(vector<int>& vec);
 void PrintChart(vector<vector<bool>> chart);
-bool Find(vector<int> arr, int x);
+bool Find(vector<int> vec, int x);
+bool MergedDuplicate(vector<Minterms> list, Minterms object);
 
 int main() {
 	vector<vector<int>> minAdont(3);
@@ -79,7 +80,7 @@ int main() {
 		}
 	}
 
-	//ImplicationTable(objects, unmerged, variables);
+	ImplicationTable(objects, unmerged, variables);
 
 	//Testing EPI
 	vector<Minterms> tempMinterms(6);
@@ -125,9 +126,17 @@ int main() {
 
 	vector<Minterms>EPIlist;
 	vector<vector<bool>> tickChart;
-	ConstructChart(tempMinterms, 6, tempPI, tickChart);
+	//ConstructChart(tempMinterms, 6, tempPI, tickChart);
 
-	EPI2(tempMinterms, tempPI, EPIlist, tickChart);
+	//EPI2(tempMinterms, tempPI, EPIlist, tickChart);
+
+	//cout << "Simplified Boolean Expression= ";
+	//for (int i = 0; i < EPIlist.size(); i++) {
+	//	EPIlist[i].BooleanExpression();
+	//	if (i != EPIlist.size() - 1) {
+	//		cout << " + ";
+	//	}
+	//}
 }
 
 void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms>& unmerged, int& var) {
@@ -138,7 +147,7 @@ void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms>&
 	while (anyMerge) {
 		anyMerge = false;
 		table.resize(impColumn + 2);
-		table[impColumn + 1].resize(var);
+		table[impColumn + 1].resize(var + 1);
 
 
 		for (int row = 0; row < table[impColumn].size() - 1; row++) {
@@ -160,9 +169,10 @@ void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms>&
 						Minterms mergedObject = table[impColumn][row][v1].Merge(table[impColumn][row + 1][v2], position);
 						cout << "Merged\n";
 
-
-						table[impColumn + 1][mergedObject.NumberOnes()].push_back(mergedObject);
-						cout << "Added to other column\n";
+						if (!MergedDuplicate(table[impColumn + 1][mergedObject.NumberOnes()], mergedObject)) {
+							table[impColumn + 1][mergedObject.NumberOnes()].push_back(mergedObject);
+							cout << "Added to other column\n";
+						}
 					}
 				}
 
@@ -176,11 +186,11 @@ void ImplicationTable(vector<vector<vector<Minterms>>>& table, vector<Minterms>&
 		impColumn++;
 	}
 
-	for (int i = 0; i < table[impColumn].size(); i++) {
-		for (int j = 0; j < table[impColumn][i].size(); j++) {
-			unmerged.push_back(table[impColumn][i][j]);
-		}
-	}
+	//	for (int i = 0; i < table[impColumn].size(); i++) {
+	//		for (int j = 0; j < table[impColumn][i].size(); j++) {
+	//			unmerged.push_back(table[impColumn][i][j]);
+	//		}
+	//	}
 
 	cout << "Prime Implicants: ";
 	for (int i = 0; i < unmerged.size(); i++) {
@@ -207,85 +217,10 @@ void ConstructChart(vector<Minterms> originalListOfMin, int numMinterms, vector<
 	cout << "Constructed chart\n";
 }
 
-/*
-void EPI(vector<Minterms> originalListOfMin, int numMinterms, vector<Minterms> originalPI, vector<Minterms>& EPIlist, vector<vector<bool>> chart)
-{
-	vector<Minterms> listofminterm(numMinterms);
-	vector<Minterms> listofmerged(originalPI.size());
 
-
-	for (int i = 0; i < numMinterms; i++) {
-		listofminterm[i] = originalListOfMin[i];
-	}
-
-	for (int i = 0; i < originalPI.size(); i++) {
-		listofmerged[i] = originalPI[i];
-
-	}
-
-
-
-	for (int i = 0; i < listofmerged.size() - 1; i++) {
-		for (int j = i + 1; j < listofmerged.size(); j++) {
-
-		}
-	}
-
-	int exist = 0;
-	int position;
-	bool dotheloop = false;
-	for (int i = 0; i < listofminterm.size(); i++)
-	{
-		for (int r = 0; r < listofmerged.size(); r++)
-		{
-			for (int j = 0; j < listofmerged[r].NumberOfDecimal(); j++) {
-				if (listofminterm[i].GetDecimal(0) == listofmerged[r].GetDecimal(j))
-				{
-					exist++;
-					position = r;
-				}
-			}
-
-		}
-		if (exist == 1)
-		{
-			dotheloop = true;
-			//for (int w = 0; w < listofmerged.size(); w++)
-			//{
-				//if (listofminterm[i][0] == listofmerged[w][0])
-				//{
-					//listofminterm[i][1] = true;
-					//EPIlist[w] = listofminterm[w][1];
-				//}
-
-			//}
-
-			EPIlist.push_back(listofmerged[position]);
-			for (int j = 0; j < listofmerged[position].NumberOfDecimal(); j++) {
-				for (int i = 0; i < listofminterm.size(); i++) {
-					if (listofminterm[i].GetDecimal(0) == listofmerged[position].GetDecimal(j)) {
-						listofminterm.erase(listofminterm.begin() + i);
-						numMinterms--;
-					}
-				}
-			}
-			listofmerged.erase(listofmerged.begin() + position);
-		}
-		if (exist == listofmerged.size()) {
-			listofminterm.erase(listofminterm.begin() + i); //erase dominating column
-		}
-	}
-	//if (dotheloop == true)
-	//	EPI(listofminterm, numMinterms, listofmerged, EPIlist);
-	//else
-		//exit;
-}
-*/
 
 void EPI2(vector<Minterms> originalListOfMin, vector<Minterms> originalPI, vector<Minterms>& EPIlist, vector<vector<bool>>& chart) {
 	bool recursive = false;
-	EPIlist.resize(originalPI.size());
-	int count = 0;
 
 	do {
 		recursive = false;
@@ -330,8 +265,8 @@ void EPI2(vector<Minterms> originalListOfMin, vector<Minterms> originalPI, vecto
 		vector<int> includedMintermsPositions;
 		for (int r = essentialPIPosition.size() - 1; r >= 0; r--) {
 			int row = essentialPIPosition[r];
-			EPIlist[count] = originalPI[row];
-			count++;
+
+			EPIlist.push_back(originalPI[row]);
 
 			cout << row << " with minterms ";
 
@@ -363,7 +298,7 @@ void EPI2(vector<Minterms> originalListOfMin, vector<Minterms> originalPI, vecto
 				numMinterms--;
 				for (int i = 0; i < number_of_merged; i++) {
 					chart[i].erase(chart[i].begin() + includedMintermsPositions[j]);
-					//chart[i][includedMintermsPositions[j]] = false;
+
 				}
 				cout << "done\n";
 				lastValue = includedMintermsPositions[j];
@@ -376,9 +311,6 @@ void EPI2(vector<Minterms> originalListOfMin, vector<Minterms> originalPI, vecto
 
 	} while (recursive);
 
-	for (int i = 0; i < EPIlist.size(); i++) {
-		EPIlist[i].printBinary();
-	}
 
 }
 
@@ -405,7 +337,7 @@ void CheckDominatingColumns(vector<Minterms>& originalListOfMin, vector<Minterms
 		numMinterms--;
 		for (int i = 0; i < number_of_merged; i++) {
 			chart[i].erase(chart[i].begin() + dominatingColumns[j]);
-			//chart[i][dominatingColumns[j]] = false;
+
 		}
 	}
 	cout << endl;
@@ -478,20 +410,20 @@ void CheckDominatedRows(vector<Minterms>& originalListOfMin, vector<Minterms>& o
 }
 
 
-void Sort(vector<int>& arr)
+void Sort(vector<int>& vec)
 {
-	int i, key, j;
-	for (i = 1; i < arr.size(); i++)
+	int key, j;
+	for (int i = 1; i < vec.size(); i++)
 	{
-		key = arr[i];
+		key = vec[i];
 		j = i - 1;
 
-		while (j >= 0 && arr[j] > key)
+		while (j >= 0 && vec[j] > key)
 		{
-			arr[j + 1] = arr[j];
+			vec[j + 1] = vec[j];
 			j = j - 1;
 		}
-		arr[j + 1] = key;
+		vec[j + 1] = key;
 	}
 }
 
@@ -510,11 +442,20 @@ void PrintChart(vector<vector<bool>> chart) {
 	}
 }
 
-bool Find(vector<int> arr, int x)
+bool Find(vector<int> vec, int x)
 {
-	int i;
-	for (i = 0; i < arr.size(); i++)
-		if (arr[i] == x)
+	for (int i = 0; i < vec.size(); i++)
+		if (vec[i] == x)
 			return true;
+	return false;
+}
+
+bool MergedDuplicate(vector<Minterms> list, Minterms object) {
+	for (int i = 0; i < list.size(); i++) {
+		if (list[i].getdigits() == object.getdigits()) {
+			return true;
+		}
+	}
+
 	return false;
 }

@@ -29,6 +29,7 @@ public:
 	int NumberOfDecimal() { return values.size(); }
 	int GetDecimal(int position) { return values[position]; }
 	void SetBoolean(string a1, string a2, string a3, string a4) { digits[0] = a4; digits[1] = a3; digits[2] = a2; digits[3] = a1; } //for testing
+	void BooleanExpression();
 };
 
 
@@ -94,10 +95,13 @@ int Minterms::checkmerg(Minterms object)
 		}
 		count++;
 	}
-	if (numofdif == 0)
+
+	if (numofdif == 1)
+		return dp;
+	else
 		return -1;
-	return dp;
 }
+
 Minterms Minterms::Merge(Minterms object1, int position) {
 	vector<string> mergestring(size);
 	for (int i = 0; i < size; i++) {
@@ -131,5 +135,18 @@ Minterms::Minterms(vector<string>newbinary) {
 			numOnes++;
 	}
 }
+
+
+void Minterms::BooleanExpression() {
+	string alpha = "ABCDEFGHIJKLMNOPQRSTUVXYZ";
+	for (int i = 0; i < size; i++) {
+		if (digits[size - 1 - i] == "0")
+			cout << alpha[i] << "'";
+		else if (digits[size - 1 - i] == "1")
+			cout << alpha[i];
+	}
+
+}
+
 
 #endif
